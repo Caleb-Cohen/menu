@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import { FetchError } from '@/lib/fetchJson';
-
+import dbConnect from '../lib/dbConnect';
+import { FetchError } from '../lib/fetchJson';
 import useUser from '../utils/useUser';
 
 export default function Login() {
@@ -52,3 +52,4 @@ export default function Login() {
     </form>
   );
 }
+
