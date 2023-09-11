@@ -16,6 +16,7 @@ const MenuItemSchema = new mongoose.Schema({
   pos: {
     type: Number,
     required: [true, 'Please add a position'],
+    unique: true,
   },
 });
 

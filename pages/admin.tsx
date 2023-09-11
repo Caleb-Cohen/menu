@@ -1,12 +1,26 @@
-import { Button, FormControl, Grid, TextField, Select, MenuItem } from '@mui/material';
+import { Button, FormControl, Grid, TextField, Select, MenuItem as MUIMenuItem } from '@mui/material';
 import { withIronSessionSsr } from 'iron-session/next';
+import { Document } from 'mongoose';
 import { useState } from 'react';
 
 import dbConnect from '../lib/dbConnect';
 import { sessionOptions } from '../lib/session';
+import MenuItem from '../models/MenuItem';
 import { User } from '../types/User';
+import convertIdToString from '../utils/convertIdToString';
 
-export default function Admin() {
+interface MenuItemType {
+  _id: string;
+  enName: string;
+  jaName: string;
+  sTime: 'lunch' | 'dinner';
+  pos: number;
+}
+interface AdminProps {
+  menuItems: MenuItemType[];
+}
+
+export default function Admin({ menuItems }: AdminProps) {
   // Users will never see this unless they're logged in.
   const [englishName, setEnglishName] = useState('');
   const [japaneseName, setJapaneseName] = useState('');
@@ -58,8 +72,8 @@ export default function Admin() {
                   label="Serving Time"
                   onChange={e => setServingTime(e.target.value)}
                 >
-                  <MenuItem value="lunch">Lunch</MenuItem>
-                  <MenuItem value="dinner">Dinner</MenuItem>
+                  <MUIMenuItem value="lunch">Lunch</MUIMenuItem>
+                  <MUIMenuItem value="dinner">Dinner</MUIMenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -71,6 +85,13 @@ export default function Admin() {
           </Grid>
         </form>
       </FormControl>
+      <ul>
+        {menuItems.map(item => (
+          <li key={item._id}>
+            {item.enName} - {item.jaName} - {item.sTime} - {item.pos}
+          </li>
+        ))}
+      </ul>
     </>
   );
 }
@@ -79,7 +100,6 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   req,
   res,
 }) {
-  await dbConnect();
   const user = req.session.user;
 
   if (user === undefined) {
@@ -92,9 +112,18 @@ export const getServerSideProps = withIronSessionSsr(async function ({
       },
     };
   }
+  if (user) {
+    await dbConnect();
 
-  return {
-    props: { user: req.session.user },
-  };
+    const menuItemsQuery = await MenuItem.find({});
+    const menuItems = menuItemsQuery.map((item: Document) => convertIdToString(item));
+    console.log(menuItems);
+    return {
+      props: {
+        user: req.session.user,
+        menuItems,
+      },
+    };
+  }
 },
 sessionOptions);

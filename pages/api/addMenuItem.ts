@@ -11,7 +11,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { englishName, japaneseName, servingTime } = req.body;
 
   try {
-    const newPosition = 1;
+    const maxPosition = await MenuItem.find().sort({ pos: -1 }).limit(1);
+    const newPosition = maxPosition[0].pos + 1;
 
     const newMenuItem = await MenuItem.create({
       enName: englishName,
@@ -21,6 +22,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     res.status(200).json({ success: true, data: newMenuItem });
+    console.log(newMenuItem);
   } catch (error) {
     console.log(error);
     console.log('DB connection state:', mongoose.connection.readyState);
