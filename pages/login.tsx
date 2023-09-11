@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import dbConnect from '../lib/dbConnect';
 import { FetchError } from '../lib/fetchJson';
 import useUser from '../utils/useUser';
 

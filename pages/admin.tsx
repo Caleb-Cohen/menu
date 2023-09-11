@@ -109,6 +109,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     return {
       props: {
         user: { isLoggedIn: false } as User,
+        menuItems: null,
       },
     };
   }
