@@ -102,27 +102,25 @@ export const getServerSideProps = withIronSessionSsr(async function ({
 }) {
   const user = req.session.user;
 
-  if (user === undefined) {
+  if (user) {
+    await dbConnect();
+
+    const menuItemsQuery = await MenuItem.find({});
+    const menuItems = menuItemsQuery.map((item: Document) => convertIdToString(item));
+    return {
+      props: {
+        user: req.session.user,
+        menuItems,
+      },
+    };
+  } else {
     res.setHeader('location', '/login');
     res.statusCode = 302;
     res.end();
     return {
       props: {
         user: { isLoggedIn: false } as User,
-        menuItems: null,
-      },
-    };
-  }
-  if (user) {
-    await dbConnect();
-
-    const menuItemsQuery = await MenuItem.find({});
-    const menuItems = menuItemsQuery.map((item: Document) => convertIdToString(item));
-    console.log(menuItems);
-    return {
-      props: {
-        user: req.session.user,
-        menuItems,
+        menuItems: [],
       },
     };
   }
