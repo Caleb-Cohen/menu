@@ -3,22 +3,13 @@ import { withIronSessionSsr } from 'iron-session/next';
 import { Document } from 'mongoose';
 import { useState } from 'react';
 
+import { MenuItemType, AdminProps } from '@/types/MenuItemTypes';
+
 import dbConnect from '../lib/dbConnect';
 import { sessionOptions } from '../lib/session';
 import MenuItem from '../models/MenuItem';
 import { User } from '../types/User';
 import convertIdToString from '../utils/convertIdToString';
-
-interface MenuItemType {
-  _id: string;
-  enName: string;
-  jaName: string;
-  sTime: 'lunch' | 'dinner';
-  pos: number;
-}
-interface AdminProps {
-  menuItems: MenuItemType[];
-}
 
 export default function Admin({ menuItems }: AdminProps) {
   // Users will never see this unless they're logged in.
@@ -106,7 +97,7 @@ export const getServerSideProps = withIronSessionSsr(async function ({
     await dbConnect();
 
     const menuItemsQuery = await MenuItem.find({});
-    const menuItems = menuItemsQuery.map((item: Document) => convertIdToString(item));
+    const menuItems = menuItemsQuery.map((item: Document) => convertIdToString(item)) as MenuItemType[];
     return {
       props: {
         user: req.session.user,
