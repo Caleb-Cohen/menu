@@ -1,15 +1,17 @@
-import { Button, FormControl, Grid, TextField, Select, MenuItem as MUIMenuItem } from '@mui/material';
+import { Button, FormControl, Grid, TextField, Select, MenuItem as MUIMenuItem, Box } from '@mui/material';
 import { withIronSessionSsr } from 'iron-session/next';
 import { Document } from 'mongoose';
 import { useState } from 'react';
 
 import { MenuItemType, AdminProps } from '@/types/MenuItemTypes';
 
+import SingleMenuItem from '../components/SingleMenuItem';
 import dbConnect from '../lib/dbConnect';
 import { sessionOptions } from '../lib/session';
 import MenuItem from '../models/MenuItem';
 import { User } from '../types/User';
 import convertIdToString from '../utils/convertIdToString';
+
 
 export default function Admin({ menuItems }: AdminProps) {
   // Users will never see this unless they're logged in.
@@ -76,13 +78,11 @@ export default function Admin({ menuItems }: AdminProps) {
           </Grid>
         </form>
       </FormControl>
-      <ul>
-        {menuItems.map(item => (
-          <li key={item._id}>
-            {item.enName} - {item.jaName} - {item.sTime} - {item.pos}
-          </li>
-        ))}
-      </ul>
+      {menuItems.map(item => (
+        <Box mb={2} key={item._id}>
+          <SingleMenuItem key={item._id} menuItem={item} />
+        </Box>
+      ))}
     </>
   );
 }
