@@ -1,4 +1,4 @@
-import { Grid, Paper, Box, TextField, MenuItem, Button } from '@mui/material';
+import { Grid, Paper, TextField, MenuItem, Button, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { mutate } from 'swr';
@@ -19,6 +19,7 @@ interface Error {
 }
 
 const SingleMenuItem = ({ menuItem }: { menuItem: MenuItemType }) => {
+  console.log(menuItem)
   const router = useRouter();
   const [error, setErrors] = useState({});
   const [message, setMessage] = useState('');
@@ -130,59 +131,61 @@ const SingleMenuItem = ({ menuItem }: { menuItem: MenuItemType }) => {
   };
 
   return (
-    <Box width={300} mx="auto">
-      <Paper elevation={5} className="max-w-md" square={false}>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={0}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                id="outlined-required"
-                name="enName"
-                label="Required"
-                defaultValue={menuItem.enName}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                id="outlined-required"
-                name='jaName'
-                label="Required"
-                defaultValue={menuItem.jaName}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                id="outlined-required"
-                name='sTime'
-                select
-                label="Required"
-                defaultValue={menuItem.sTime}
-                onChange={handleChange}
-              >
-                {servingTime.map(option => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))};
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Button type="submit" variant="contained">Submit</Button>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Button variant="contained" color="secondary" onClick={() => deleteData(form)}>
-                Delete
-              </Button>
-            </Grid>
+    <Paper elevation={5} sx={{ width: '400px', padding: '20px' }} square={false}>
+      <Typography>Item is in Position {menuItem.pos} for {menuItem.sTime}</Typography>
+      <form onSubmit={handleSubmit}>
+        <Grid container spacing={0}>
+          <Grid item xs={12} sm={6} margin={1}>
+            <Typography margin={1}> Japanese Name: </Typography>
+            <TextField
+              required
+              id="outlined-required"
+              name="enName"
+              label="Required"
+              defaultValue={menuItem.enName}
+              onChange={handleChange}
+            />
           </Grid>
-        </form>
-      </Paper>
-    </Box>
+          <Grid item xs={12} sm={6} margin={1}>
+            <Typography margin={1}> English Name: </Typography>
+            <TextField
+              required
+              id="outlined-required"
+              name='jaName'
+              label="Required"
+              defaultValue={menuItem.jaName}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} margin={1}>
+            <Typography margin={1}> Serving Time: </Typography>
+            <TextField
+              required
+              id="outlined-required"
+              name='sTime'
+              select
+              label="Required"
+              defaultValue={menuItem.sTime}
+              onChange={handleChange}
+            >
+              {servingTime.map(option => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))};
+            </TextField>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Button type="submit" variant="contained">Submit</Button>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Button variant="contained" color="secondary" onClick={() => deleteData(form)}>
+                Delete
+            </Button>
+          </Grid>
+        </Grid>
+      </form>
+    </Paper>
   );
 };
 

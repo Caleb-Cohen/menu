@@ -1,6 +1,7 @@
 import { Button, FormControl, Grid, TextField, Select, MenuItem as MUIMenuItem, Box } from '@mui/material';
 import { withIronSessionSsr } from 'iron-session/next';
 import { Document } from 'mongoose';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import { MenuItemType, AdminProps } from '@/types/MenuItemTypes';
@@ -12,12 +13,15 @@ import MenuItem from '../models/MenuItem';
 import { User } from '../types/User';
 import convertIdToString from '../utils/convertIdToString';
 
-
 export default function Admin({ menuItems }: AdminProps) {
+  const router = useRouter();
   // Users will never see this unless they're logged in.
   const [englishName, setEnglishName] = useState('');
   const [japaneseName, setJapaneseName] = useState('');
   const [servingTime, setServingTime] = useState('');
+
+  const lunchMenuItems = menuItems.filter((item: MenuItemType) => item.sTime === 'lunch');
+  const dinnerMenuItems = menuItems.filter((item: MenuItemType) => item.sTime === 'dinner');
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -35,6 +39,7 @@ export default function Admin({ menuItems }: AdminProps) {
         body: JSON.stringify(data),
       });
       console.log(response, 'successfully added menu item');
+      router.push('/admin');
     } catch (error) {
       console.error('An unexpected error happened:', error);
     }
@@ -78,11 +83,22 @@ export default function Admin({ menuItems }: AdminProps) {
           </Grid>
         </form>
       </FormControl>
-      {menuItems.map(item => (
-        <Box mb={2} key={item._id}>
-          <SingleMenuItem key={item._id} menuItem={item} />
-        </Box>
-      ))}
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          {lunchMenuItems.map(item => (
+            <Box mb={2} key={item._id}>
+              <SingleMenuItem key={item._id} menuItem={item} />
+            </Box>
+          ))}
+        </Grid>
+        <Grid item xs={6}>
+          {dinnerMenuItems.map(item => (
+            <Box mb={2} key={item._id}>
+              <SingleMenuItem key={item._id} menuItem={item} />
+            </Box>
+          ))}
+        </Grid>
+      </Grid>
     </>
   );
 }

@@ -11,8 +11,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { englishName, japaneseName, servingTime } = req.body;
 
   try {
-    const maxPosition = await MenuItem.find().sort({ pos: -1 }).limit(1);
-    const newPosition = maxPosition[0].pos + 1;
+    const maxPosition = await MenuItem.find({ sTime: servingTime }).sort({ pos: -1 }).limit(1);
+    const newPosition = maxPosition[0] ? maxPosition[0].pos + 1 : 1;
 
     const newMenuItem = await MenuItem.create({
       enName: englishName,
