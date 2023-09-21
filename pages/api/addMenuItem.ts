@@ -12,7 +12,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     const maxPosition = await MenuItem.find({ sTime: servingTime }).sort({ pos: -1 }).limit(1);
-    const newPosition = maxPosition[0] ? maxPosition[0].pos + 1 : 1;
+    const newPosition = maxPosition[0] ? maxPosition[0].pos + 100 : 100;
 
     const newMenuItem = await MenuItem.create({
       enName: englishName,

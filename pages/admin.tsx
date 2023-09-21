@@ -3,9 +3,12 @@ import { withIronSessionSsr } from 'iron-session/next';
 import { Document } from 'mongoose';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import { DragDropContext, Droppable, Draggable, DropResult, ResponderProvided } from 'react-beautiful-dnd';
+import { mutate } from 'swr';
 
 import { MenuItemType, AdminProps } from '@/types/MenuItemTypes';
 
+import NoSsr from '../components/NoSsr';
 import SingleMenuItem from '../components/SingleMenuItem';
 import dbConnect from '../lib/dbConnect';
 import { sessionOptions } from '../lib/session';
@@ -20,8 +23,10 @@ export default function Admin({ menuItems }: AdminProps) {
   const [japaneseName, setJapaneseName] = useState('');
   const [servingTime, setServingTime] = useState('');
 
-  const lunchMenuItems = menuItems.filter((item: MenuItemType) => item.sTime === 'lunch');
-  const dinnerMenuItems = menuItems.filter((item: MenuItemType) => item.sTime === 'dinner');
+  const lunchMenuItems = menuItems.filter((item: MenuItemType) => item.sTime === 'lunch')
+    .sort((a: MenuItemType, b: MenuItemType) => a.pos - b.pos);
+  const dinnerMenuItems = menuItems.filter((item: MenuItemType) => item.sTime === 'dinner')
+    .sort((a: MenuItemType, b: MenuItemType) => a.pos - b.pos);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -43,6 +48,86 @@ export default function Admin({ menuItems }: AdminProps) {
     } catch (error) {
       console.error('An unexpected error happened:', error);
     }
+  };
+
+  const putData = async(form: FormData) => {
+    const id = form._id;
+
+    try {
+      const res = await fetch(`/api/menuitems/${id}`, {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) {
+        throw new Error(res.status.toString());
+      }
+
+      const { data } = await res.json();
+
+      mutate(`/api/menu/${id}`, data, false);
+      router.push('/admin');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onDragEnd = (result: DropResult, provided: ResponderProvided) => {
+    const { destination, source, draggableId } = result;
+
+    if (!destination) {
+      return;
+    }
+
+    if (
+      destination.droppableId === source.droppableId &&
+    destination.index === source.index
+    ) {
+      return;
+    }
+    const column = source.droppableId;
+    const newTasksIds = Array.from(column);
+
+    //psuedo code
+
+    //take object array from lunchItems
+
+    //find the index of destination id
+    const destinationIndex = destination.index;
+
+    let destinationPosBefore = 0;
+    let destinationPosAfter = 0;
+
+    // Determine the direction of the movement
+    if (source.index < destination.index) {
+      // Moved down the list
+      destinationPosBefore = lunchMenuItems[destination.index]?.pos;
+      destinationPosAfter = lunchMenuItems[destination.index + 1]?.pos;
+    } else {
+      // Moved up the list
+      destinationPosBefore = lunchMenuItems[destination.index - 1]?.pos;
+      destinationPosAfter = lunchMenuItems[destination.index]?.pos;
+    }
+
+    //avg both positions
+    let averagePos = 0;
+    if (!destinationPosBefore) {
+      averagePos = lunchMenuItems[destinationIndex].pos / 2;
+    } else if (!destinationPosAfter) {
+      averagePos = lunchMenuItems[destinationIndex].pos + 100;
+    } else averagePos = (destinationPosBefore + destinationPosAfter) / 2;
+    //update db with new position
+    const indexToUpdate = source.index;
+    const menuItemToUpdate = lunchMenuItems[indexToUpdate];
+    const formData = {
+      ...menuItemToUpdate,
+      pos: averagePos,
+    };
+    putData(formData);
   };
 
   return (
@@ -83,22 +168,41 @@ export default function Admin({ menuItems }: AdminProps) {
           </Grid>
         </form>
       </FormControl>
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          {lunchMenuItems.map(item => (
-            <Box mb={2} key={item._id}>
-              <SingleMenuItem key={item._id} menuItem={item} />
-            </Box>
-          ))}
-        </Grid>
-        <Grid item xs={6}>
+      <NoSsr>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Grid container spacing={2}>
+            <Droppable droppableId="lunch">
+              {providedDroppable => (
+                <Grid item xs={6} ref={providedDroppable.innerRef} {...providedDroppable.droppableProps}>
+                  {lunchMenuItems.map((item, index) => (
+                    <Box mb={2} key={item._id}>
+                      <Draggable draggableId={item._id} index={index}>
+                        {providedDraggable => (
+                          <SingleMenuItem
+                            key={item._id}
+                            menuItem={item}
+                            innerRef={providedDraggable.innerRef}
+                            provided={providedDraggable}
+                          >
+                            {providedDroppable.placeholder}
+                          </SingleMenuItem>
+                        )}
+                      </Draggable>
+                    </Box>
+                  ))}
+                </Grid>
+              )}
+            </Droppable>
+          </Grid>
+          {/* <Grid item xs={6}>
           {dinnerMenuItems.map(item => (
             <Box mb={2} key={item._id}>
               <SingleMenuItem key={item._id} menuItem={item} />
             </Box>
           ))}
-        </Grid>
-      </Grid>
+          </Grid> */}
+        </DragDropContext>
+      </NoSsr>
     </>
   );
 }

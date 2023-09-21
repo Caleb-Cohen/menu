@@ -1,11 +1,14 @@
 import { Grid, Paper, TextField, MenuItem, Button, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { mutate } from 'swr';
 
-import { MenuItemType } from '@/types/MenuItemTypes';
+import { MenuItemType } from '../types/MenuItemTypes';
+
+import { DraggableProvided } from 'react-beautiful-dnd';
 
 interface FormData {
+  pos?: number;
   id: string;
   enName: string;
   jaName: string;
@@ -18,13 +21,20 @@ interface Error {
   sTime?: string;
 }
 
-const SingleMenuItem = ({ menuItem }: { menuItem: MenuItemType }) => {
-  console.log(menuItem)
+interface SingleMenuItemProps {
+  menuItem: MenuItemType;
+  provided: DraggableProvided;
+  innerRef: (element: HTMLElement | null) => void;
+  children?: React.ReactNode;
+}
+
+const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) => {
   const router = useRouter();
   const [error, setErrors] = useState({});
   const [message, setMessage] = useState('');
 
   const [form, setForm] = useState({
+    pos: menuItem.pos,
     id: menuItem._id,
     enName: menuItem.enName,
     jaName: menuItem.jaName,
@@ -130,8 +140,22 @@ const SingleMenuItem = ({ menuItem }: { menuItem: MenuItemType }) => {
     }
   };
 
+  const myRef = useRef(null);
+
+  const setRef = (ref) => {
+    innerRef(ref);
+    myRef.current = ref;
+  };
+
   return (
-    <Paper elevation={5} sx={{ width: '400px', padding: '20px' }} square={false}>
+    <Paper
+      elevation={5}
+      sx={{ width: '400px', padding: '20px' }}
+      square={false}
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+      ref={setRef}
+    >
       <Typography>Item is in Position {menuItem.pos} for {menuItem.sTime}</Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={0}>
