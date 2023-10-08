@@ -15,6 +15,7 @@ import { sessionOptions } from '../lib/session';
 import MenuItem from '../models/MenuItem';
 import { User } from '../types/User';
 import convertIdToString from '../utils/convertIdToString';
+import { calculateAveragePosition, findNeighbourPositions } from '../utils/dragDropHelpers';
 
 export default function Admin({ menuItems }: AdminProps) {
   const router = useRouter();
@@ -89,38 +90,15 @@ export default function Admin({ menuItems }: AdminProps) {
     ) {
       return;
     }
-    const column = source.droppableId;
-    const newTasksIds = Array.from(column);
 
-    //psuedo code
+    const { before, after } = findNeighbourPositions(
+      source.index,
+      destination.index,
+      lunchMenuItems,
+    );
 
-    //take object array from lunchItems
-
-    //find the index of destination id
-    const destinationIndex = destination.index;
-
-    let destinationPosBefore = 0;
-    let destinationPosAfter = 0;
-
-    // Determine the direction of the movement
-    if (source.index < destination.index) {
-      // Moved down the list
-      destinationPosBefore = lunchMenuItems[destination.index]?.pos;
-      destinationPosAfter = lunchMenuItems[destination.index + 1]?.pos;
-    } else {
-      // Moved up the list
-      destinationPosBefore = lunchMenuItems[destination.index - 1]?.pos;
-      destinationPosAfter = lunchMenuItems[destination.index]?.pos;
-    }
-
-    //avg both positions
-    let averagePos = 0;
-    if (!destinationPosBefore) {
-      averagePos = lunchMenuItems[destinationIndex].pos / 2;
-    } else if (!destinationPosAfter) {
-      averagePos = lunchMenuItems[destinationIndex].pos + 100;
-    } else averagePos = (destinationPosBefore + destinationPosAfter) / 2;
-    //update db with new position
+    const averagePos = calculateAveragePosition(before, after, lunchMenuItems);
+    // update db with new position
     const indexToUpdate = source.index;
     const menuItemToUpdate = lunchMenuItems[indexToUpdate];
     const formData = {
