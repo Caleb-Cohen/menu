@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult, ResponderProvided } from 'react-beautiful-dnd';
 import { mutate } from 'swr';
 
-import { MenuItemType, AdminProps } from '@/types/MenuItemTypes';
+import { MenuItemType, AdminProps, MenuItemFormData } from '@/types/MenuItemTypes';
 
 import NoSsr from '../components/NoSsr';
 import SingleMenuItem from '../components/SingleMenuItem';
@@ -51,7 +51,7 @@ export default function Admin({ menuItems }: AdminProps) {
     }
   };
 
-  const putData = async(form: FormData) => {
+  const putData = async(form: MenuItemFormData) => {
     const id = form._id;
 
     try {

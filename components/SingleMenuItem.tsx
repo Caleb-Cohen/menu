@@ -1,19 +1,10 @@
 import { Grid, Paper, TextField, MenuItem, Button, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
+import { DraggableProvided } from 'react-beautiful-dnd';
 import { mutate } from 'swr';
 
-import { MenuItemType } from '../types/MenuItemTypes';
-
-import { DraggableProvided } from 'react-beautiful-dnd';
-
-interface FormData {
-  pos?: number;
-  id: string;
-  enName: string;
-  jaName: string;
-  sTime: 'lunch' | 'dinner';
-}
+import { MenuItemType, MenuItemFormData } from '../types/MenuItemTypes';
 
 interface Error {
   enName?: string;
@@ -52,7 +43,7 @@ const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) =
     },
   ];
 
-  const putData = async(form: FormData) => {
+  const putData = async(form: MenuItemFormData) => {
     const id = form.id;
 
     try {
@@ -78,7 +69,7 @@ const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) =
     }
   };
 
-  const deleteData = async(form: FormData) => {
+  const deleteData = async(form: MenuItemFormData) => {
     const id = form.id;
 
     try {
@@ -142,7 +133,7 @@ const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) =
 
   const myRef = useRef(null);
 
-  const setRef = (ref) => {
+  const setRef = ref => {
     innerRef(ref);
     myRef.current = ref;
   };

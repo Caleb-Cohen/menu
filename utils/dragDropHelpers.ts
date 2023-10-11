@@ -1,9 +1,10 @@
+import { NeighbourPositions } from '@/types/HelperTypes';
 import { MenuItemType } from '@/types/MenuItemTypes';
 
 export const calculateAveragePosition = (
   destinationPosBefore: number | undefined,
   destinationPosAfter: number | undefined,
-  lunchMenuItems: MenuItemType,
+  lunchMenuItems: MenuItemType[],
 ): number => {
   if (!destinationPosBefore) {
     return lunchMenuItems[0].pos / 2;
@@ -14,7 +15,11 @@ export const calculateAveragePosition = (
   return (destinationPosBefore + destinationPosAfter) / 2;
 };
 
-export const findNeighbourPositions = (sourceIndex, destinationIndex, lunchMenuItems) => {
+export const findNeighbourPositions = (
+  sourceIndex: number,
+  destinationIndex: number,
+  lunchMenuItems: MenuItemType[],
+): NeighbourPositions => {
   let destinationPosBefore = 0;
   let destinationPosAfter = 0;
 
@@ -25,7 +30,7 @@ export const findNeighbourPositions = (sourceIndex, destinationIndex, lunchMenuI
     destinationPosBefore = lunchMenuItems[destinationIndex - 1]?.pos;
     destinationPosAfter = lunchMenuItems[destinationIndex].pos;
   }
-  console.log(destinationPosBefore, destinationPosAfter);
+
   return { before: destinationPosBefore, after: destinationPosAfter };
 };
 
