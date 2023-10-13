@@ -3,10 +3,10 @@ import { withIronSessionSsr } from 'iron-session/next';
 import { Document } from 'mongoose';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { DragDropContext, Droppable, Draggable, DropResult, ResponderProvided } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { mutate } from 'swr';
 
-import { MenuItemType, AdminProps, MenuItemFormData } from '@/types/MenuItemTypes';
+import { MenuItemType, AdminProps } from '@/types/MenuItemTypes';
 
 import NoSsr from '../components/NoSsr';
 import SingleMenuItem from '../components/SingleMenuItem';
@@ -51,7 +51,7 @@ export default function Admin({ menuItems }: AdminProps) {
     }
   };
 
-  const putData = async(form: MenuItemFormData) => {
+  const putData = async(form: MenuItemType) => {
     const id = form._id;
 
     try {
@@ -77,7 +77,7 @@ export default function Admin({ menuItems }: AdminProps) {
     }
   };
 
-  const onDragEnd = (result: DropResult, provided: ResponderProvided) => {
+  const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId } = result;
 
     if (!destination) {
@@ -91,19 +91,30 @@ export default function Admin({ menuItems }: AdminProps) {
       return;
     }
 
+    const destinationMenuItems = destination.droppableId === 'lunch' ? lunchMenuItems : dinnerMenuItems;
+
+    const differentColumn = destination.droppableId !== source.droppableId;
     const { before, after } = findNeighbourPositions(
       source.index,
       destination.index,
-      lunchMenuItems,
+      destinationMenuItems,
+      differentColumn,
     );
 
-    const averagePos = calculateAveragePosition(before, after, lunchMenuItems);
-    // update db with new position
-    const indexToUpdate = source.index;
-    const menuItemToUpdate = lunchMenuItems[indexToUpdate];
+    const averagePos = calculateAveragePosition(before, after, destinationMenuItems);
+
+    const menuItemToUpdate = menuItems.find((item: MenuItemType) => item._id === draggableId);
+
+    if (!menuItemToUpdate) {
+      console.error('Unexpected error: menuItemToUpdate is undefined');
+      return;
+    }
+
+    console.log('menuItemToUpdate', menuItemToUpdate);
     const formData = {
       ...menuItemToUpdate,
       pos: averagePos,
+      sTime: destination.droppableId as 'lunch' | 'dinner',
     };
     putData(formData);
   };
@@ -148,37 +159,56 @@ export default function Admin({ menuItems }: AdminProps) {
       </FormControl>
       <NoSsr>
         <DragDropContext onDragEnd={onDragEnd}>
-          <Grid container spacing={2}>
-            <Droppable droppableId="lunch">
-              {providedDroppable => (
-                <Grid item xs={6} ref={providedDroppable.innerRef} {...providedDroppable.droppableProps}>
-                  {lunchMenuItems.map((item, index) => (
-                    <Box mb={2} key={item._id}>
-                      <Draggable draggableId={item._id} index={index}>
-                        {providedDraggable => (
-                          <SingleMenuItem
-                            key={item._id}
-                            menuItem={item}
-                            innerRef={providedDraggable.innerRef}
-                            provided={providedDraggable}
-                          >
-                            {providedDroppable.placeholder}
-                          </SingleMenuItem>
-                        )}
-                      </Draggable>
-                    </Box>
-                  ))}
-                </Grid>
-              )}
-            </Droppable>
+          <Grid container direction="row" spacing={2}>
+            <Grid item xs={6}>
+              <Droppable droppableId="lunch">
+                {providedDroppable => (
+                  <Grid item xs={6} ref={providedDroppable.innerRef} {...providedDroppable.droppableProps}>
+                    {lunchMenuItems.map((item, index) => (
+                      <Box mb={2} key={item._id}>
+                        <Draggable draggableId={item._id} index={index}>
+                          {providedDraggable => (
+                            <SingleMenuItem
+                              key={item._id}
+                              menuItem={item}
+                              innerRef={providedDraggable.innerRef}
+                              provided={providedDraggable}
+                            >
+                              {providedDroppable.placeholder}
+                            </SingleMenuItem>
+                          )}
+                        </Draggable>
+                      </Box>
+                    ))}
+                  </Grid>
+                )}
+              </Droppable>
+            </Grid>
+            <Grid item xs={6}>
+              <Droppable droppableId="dinner">
+                {providedDroppable => (
+                  <Grid item xs={6} ref={providedDroppable.innerRef} {...providedDroppable.droppableProps}>
+                    {dinnerMenuItems.map((item, index) => (
+                      <Box mb={2} key={item._id}>
+                        <Draggable draggableId={item._id} index={index}>
+                          {providedDraggable => (
+                            <SingleMenuItem
+                              key={item._id}
+                              menuItem={item}
+                              innerRef={providedDraggable.innerRef}
+                              provided={providedDraggable}
+                            >
+                              {providedDroppable.placeholder}
+                            </SingleMenuItem>
+                          )}
+                        </Draggable>
+                      </Box>
+                    ))}
+                  </Grid>
+                )}
+              </Droppable>
+            </Grid>
           </Grid>
-          {/* <Grid item xs={6}>
-          {dinnerMenuItems.map(item => (
-            <Box mb={2} key={item._id}>
-              <SingleMenuItem key={item._id} menuItem={item} />
-            </Box>
-          ))}
-          </Grid> */}
         </DragDropContext>
       </NoSsr>
     </>

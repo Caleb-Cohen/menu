@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import { mutate } from 'swr';
 
-import { MenuItemType, MenuItemFormData } from '../types/MenuItemTypes';
+import { MenuItemType } from '../types/MenuItemTypes';
 
 interface Error {
   enName?: string;
@@ -26,7 +26,7 @@ const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) =
 
   const [form, setForm] = useState({
     pos: menuItem.pos,
-    id: menuItem._id,
+    _id: menuItem._id,
     enName: menuItem.enName,
     jaName: menuItem.jaName,
     sTime: menuItem.sTime,
@@ -43,11 +43,11 @@ const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) =
     },
   ];
 
-  const putData = async(form: MenuItemFormData) => {
-    const id = form.id;
+  const putData = async(form: MenuItemType) => {
+    const _id = form._id;
 
     try {
-      const res = await fetch(`/api/menuitems/${id}`, {
+      const res = await fetch(`/api/menuitems/${_id}`, {
         method: 'PUT',
         headers: {
           Accept: 'application/json',
@@ -62,18 +62,18 @@ const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) =
 
       const { data } = await res.json();
 
-      mutate(`/api/menu/${id}`, data, false);
+      mutate(`/api/menu/${_id}`, data, false);
       router.push('/admin');
     } catch (error) {
       console.error(error);
     }
   };
 
-  const deleteData = async(form: MenuItemFormData) => {
-    const id = form.id;
+  const deleteData = async(form: MenuItemType) => {
+    const _id = form._id;
 
     try {
-      const res = await fetch(`/api/menuitems/${id}`, {
+      const res = await fetch(`/api/menuitems/${_id}`, {
         method: 'DELETE',
         headers: {
           Accept: 'application/json',
@@ -85,7 +85,7 @@ const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) =
         throw new Error(res.status.toString());
       }
 
-      mutate(`/api/menu/${id}`, false);
+      mutate(`/api/menu/${_id}`, false);
       router.push('/admin');
     } catch (error) {
       console.error(error);

@@ -1,36 +1,46 @@
 import { NeighbourPositions } from '@/types/HelperTypes';
 import { MenuItemType } from '@/types/MenuItemTypes';
 
-export const calculateAveragePosition = (
-  destinationPosBefore: number | undefined,
-  destinationPosAfter: number | undefined,
-  lunchMenuItems: MenuItemType[],
-): number => {
-  if (!destinationPosBefore) {
-    return lunchMenuItems[0].pos / 2;
-  }
-  if (!destinationPosAfter) {
-    return lunchMenuItems[lunchMenuItems.length - 1].pos + 100;
-  }
-  return (destinationPosBefore + destinationPosAfter) / 2;
-};
-
 export const findNeighbourPositions = (
   sourceIndex: number,
   destinationIndex: number,
-  lunchMenuItems: MenuItemType[],
+  menuItems: MenuItemType[],
+  differentColumn: boolean,
 ): NeighbourPositions => {
   let destinationPosBefore = 0;
   let destinationPosAfter = 0;
 
+  if (differentColumn) {
+    destinationPosBefore = menuItems[destinationIndex - 1]?.pos;
+    destinationPosAfter = menuItems[destinationIndex]?.pos;
+    return { before: destinationPosBefore, after: destinationPosAfter };
+  }
+
   if (sourceIndex < destinationIndex) {
-    destinationPosBefore = lunchMenuItems[destinationIndex].pos;
-    destinationPosAfter = lunchMenuItems[destinationIndex + 1]?.pos;
+    destinationPosBefore = menuItems[destinationIndex].pos;
+    destinationPosAfter = menuItems[destinationIndex + 1]?.pos;
   } else {
-    destinationPosBefore = lunchMenuItems[destinationIndex - 1]?.pos;
-    destinationPosAfter = lunchMenuItems[destinationIndex].pos;
+    destinationPosBefore = menuItems[destinationIndex - 1]?.pos;
+    destinationPosAfter = menuItems[destinationIndex].pos;
   }
 
   return { before: destinationPosBefore, after: destinationPosAfter };
+};
+
+export const calculateAveragePosition = (
+  destinationPosBefore: number | undefined,
+  destinationPosAfter: number | undefined,
+  menuItems: MenuItemType[],
+): number => {
+  if (menuItems.length === 0) {
+    return 100;
+  }
+  if (!destinationPosBefore) {
+    return menuItems[0].pos / 2;
+  }
+  if (!destinationPosAfter) {
+    return menuItems[menuItems.length - 1].pos + 100;
+  }
+  return (destinationPosBefore + destinationPosAfter) / 2;
 };
 
