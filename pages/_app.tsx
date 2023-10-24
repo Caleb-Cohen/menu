@@ -1,6 +1,6 @@
 // These styles apply to every route in the application
-import { StyledEngineProvider, ThemeProvider, createTheme } from '@mui/material';
 import '../styles/globals.css';
+import { StyledEngineProvider, ThemeProvider, createTheme } from '@mui/material';
 import type { AppProps } from 'next/app';
 
 let theme = createTheme();

@@ -1,5 +1,3 @@
-import { Box } from '@mui/material';
-
 export default function index() {
   return (
     <div className="flex flex-col justify-center items-center">
