@@ -1,6 +1,6 @@
 import { Grid, Paper, TextField, MenuItem, Button, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import { mutate } from 'swr';
 
@@ -131,13 +131,6 @@ const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) =
     }
   };
 
-  const myRef = useRef(null);
-
-  const setRef = ref => {
-    innerRef(ref);
-    myRef.current = ref;
-  };
-
   return (
     <Paper
       elevation={5}
@@ -145,7 +138,7 @@ const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) =
       square={false}
       {...provided.draggableProps}
       {...provided.dragHandleProps}
-      ref={setRef}
+      ref={innerRef}
     >
       <Typography>Item is in Position {menuItem.pos} for {menuItem.sTime}</Typography>
       <form onSubmit={handleSubmit}>
