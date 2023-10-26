@@ -16,7 +16,7 @@ export default function Index() {
           objectFit: 'contain',
         }}
       />
-      <Typography sx={{ justifyContent: 'center' }}> 10/21/23 </Typography>
+      <Typography sx={{ textAlign: 'center' }}> 10/21/23 </Typography>
     </Box>
   );
 }
