@@ -1,18 +1,14 @@
-export default function index() {
-  return (
-    <div className="flex flex-col justify-center items-center">
-      <span className="mt-[33vw] text-[2vw]">10/21/23</span>
-      <img
-        src="/images/top_logo_mark.png"
-        alt="Top Image"
-        className="absolute top-0"
-      />
-      <img
-        src="/images/Takayama_Logo.png"
-        alt="Bottom Image"
-        className="absolute top-0"
-      />
-    </div>
+import { Box } from '@mui/material';
 
+export default function Index() {
+  return (
+    <Box className="flex flex-col justify-center items-center h-screen w-full border-8 border-indigo-500/100">
+      <Box
+        component="img"
+        alt="Logo"
+        src="https://i.ibb.co/p2bxYNc/Takayama-Full-Logo.png"
+      />
+      <Box className="mt-4 text-[2vw]"> 10/21/23 </Box>
+    </Box>
   );
 }
