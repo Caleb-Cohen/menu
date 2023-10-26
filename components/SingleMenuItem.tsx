@@ -16,7 +16,6 @@ interface SingleMenuItemProps {
   menuItem: MenuItemType;
   provided: DraggableProvided;
   innerRef: (element: HTMLElement | null) => void;
-  children?: React.ReactNode;
 }
 
 const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) => {
