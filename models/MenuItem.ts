@@ -1,13 +1,21 @@
 import mongoose from 'mongoose';
 
 const MenuItemSchema = new mongoose.Schema({
+  jaName: {
+    type: String,
+    required: [true, 'Please add a Japanese name'],
+  },
+  jaDescription: {
+    type: String,
+    required: false,
+  },
   enName: {
     type: String,
     required: [true, 'Please add an English name'],
   },
-  jaName: {
+  enDescription: {
     type: String,
-    required: [true, 'Please add a Japanese name'],
+    required: false,
   },
   sTime: {
     type: String, enum: ['lunch', 'dinner'],

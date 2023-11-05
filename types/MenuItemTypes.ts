@@ -1,7 +1,9 @@
 export type MenuItemType = {
   _id: string;
-  enName: string;
   jaName: string;
+  jaDescription: string;
+  enName: string;
+  enDescription: string;
   sTime: 'lunch' | 'dinner';
   pos: number;
 };

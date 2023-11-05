@@ -1,9 +1,8 @@
-import { Document } from 'mongoose';
+import { MenuItemType } from '@/types/MenuItemTypes';
 
-export default function convertIdToString(document: Document) {
-  const docObject = document.toObject() ? document.toObject() : document;
+export default function convertIdToString(menuItem: MenuItemType) {
   return {
-    ...docObject,
-    _id: docObject._id.toString(),
+    ...menuItem,
+    _id: menuItem._id.toString(),
   };
 }

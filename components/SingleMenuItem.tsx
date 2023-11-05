@@ -16,6 +16,7 @@ interface SingleMenuItemProps {
   menuItem: MenuItemType;
   provided: DraggableProvided;
   innerRef: (element: HTMLElement | null) => void;
+  children?: React.ReactNode;
 }
 
 const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) => {
@@ -26,8 +27,10 @@ const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) =
   const [form, setForm] = useState({
     pos: menuItem.pos,
     _id: menuItem._id,
-    enName: menuItem.enName,
     jaName: menuItem.jaName,
+    jaDescription: menuItem.jaDescription,
+    enName: menuItem.enName,
+    enDescription: menuItem.enDescription,
     sTime: menuItem.sTime,
   });
 
@@ -54,7 +57,6 @@ const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) =
         },
         body: JSON.stringify(form),
       });
-
       if (!res.ok) {
         throw new Error(res.status.toString());
       }
@@ -146,10 +148,17 @@ const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) =
             <Typography margin={1}> Japanese Name: </Typography>
             <TextField
               required
-              id="outlined-required"
-              name="enName"
+              name="jaName"
               label="Required"
-              defaultValue={menuItem.enName}
+              defaultValue={menuItem.jaName}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} margin={1}>
+            <Typography margin={1}> Japanese Description: </Typography>
+            <TextField
+              name="jaDescription"
+              defaultValue={menuItem.jaDescription}
               onChange={handleChange}
             />
           </Grid>
@@ -157,10 +166,17 @@ const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) =
             <Typography margin={1}> English Name: </Typography>
             <TextField
               required
-              id="outlined-required"
-              name='jaName'
+              name='enName'
               label="Required"
-              defaultValue={menuItem.jaName}
+              defaultValue={menuItem.enName}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} margin={1}>
+            <Typography margin={1}> English Description: </Typography>
+            <TextField
+              name='enDescription'
+              defaultValue={menuItem.enDescription}
               onChange={handleChange}
             />
           </Grid>
@@ -168,7 +184,6 @@ const SingleMenuItem = ({ menuItem, provided, innerRef }: SingleMenuItemProps) =
             <Typography margin={1}> Serving Time: </Typography>
             <TextField
               required
-              id="outlined-required"
               name='sTime'
               select
               label="Required"

@@ -20,8 +20,10 @@ import { calculateAveragePosition, findNeighbourPositions } from '../utils/dragD
 export default function Admin({ menuItems }: AdminProps) {
   const router = useRouter();
   // Users will never see this unless they're logged in.
-  const [englishName, setEnglishName] = useState('');
   const [japaneseName, setJapaneseName] = useState('');
+  const [japaneseDescription, setJapaneseDescription] = useState('');
+  const [englishName, setEnglishName] = useState('');
+  const [englishDescription, setEnglishDescription] = useState('');
   const [servingTime, setServingTime] = useState('');
 
   const lunchMenuItems = menuItems.filter((item: MenuItemType) => item.sTime === 'lunch')
@@ -33,8 +35,10 @@ export default function Admin({ menuItems }: AdminProps) {
     event.preventDefault();
 
     const data = {
-      englishName,
       japaneseName,
+      japaneseDescription,
+      englishName,
+      englishDescription,
       servingTime,
     };
 
@@ -53,7 +57,6 @@ export default function Admin({ menuItems }: AdminProps) {
 
   const putData = async(form: MenuItemType) => {
     const id = form._id;
-
     try {
       const res = await fetch(`/api/menuitems/${id}`, {
         method: 'PUT',
@@ -127,15 +130,29 @@ export default function Admin({ menuItems }: AdminProps) {
           <Grid container spacing={0}>
             <Grid item xs={12} sm={6}>
               <TextField id="outlined-multiline-flexible"
+                name="japaneseName"
                 label="Japanese Name"
+                multiline maxRows={4}
+                value={japaneseName}
+                onChange={e => setJapaneseName(e.target.value)} />
+              <TextField id="outlined-multiline-flexible"
+                name='japaneseDescription'
+                label="Japanese Description"
+                multiline maxRows={4}
+                value={japaneseDescription}
+                onChange={e => setJapaneseDescription(e.target.value)} />
+              <TextField id="outlined-multiline-flexible"
+                name="englishName"
+                label="English Name"
                 multiline maxRows={4}
                 value={englishName}
                 onChange={e => setEnglishName(e.target.value)} />
               <TextField id="outlined-multiline-flexible"
-                label="English Name"
+                name='englishDescription'
+                label="English Description"
                 multiline maxRows={4}
-                value={japaneseName}
-                onChange={e => setJapaneseName(e.target.value)} />
+                value={englishDescription}
+                onChange={e => setEnglishDescription(e.target.value)} />
               <FormControl fullWidth>
                 <Select
                   labelId="serving-time-label"
@@ -224,8 +241,11 @@ export const getServerSideProps = withIronSessionSsr(async function ({
   if (user) {
     await dbConnect();
 
-    const menuItemsQuery = await MenuItem.find({});
-    const menuItems = menuItemsQuery.map((item: Document) => convertIdToString(item)) as MenuItemType[];
+    const menuItemsQuery: (Document & MenuItemType)[] = await MenuItem.find({});
+    const menuItems = menuItemsQuery.map((item: Document<MenuItemType>) => {
+      const itemToObject = item.toObject();
+      return convertIdToString(itemToObject);
+    }) as MenuItemType[];
     return {
       props: {
         user: req.session.user,
