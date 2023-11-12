@@ -18,6 +18,11 @@ export default function Index({
   const [language, setLanguage] = useState('Japanese');
   const [meal, setMeal] = useState('dinner');
 
+  const dateUS = new Date().toLocaleDateString('en-US');
+  const dateJP = new Date().toLocaleDateString('ja-JP');
+
+  const dateLocalized = language === 'Japanese' ? dateJP : dateUS;
+
   return (
     <Box
       sx={{
@@ -34,17 +39,18 @@ export default function Index({
           objectFit: 'contain',
         }}
       />
-      <Typography> 10/26/23 </Typography>
+      <Typography> { dateLocalized } </Typography>
       <Box>
         <Button onClick={() => setLanguage('Japanese')}>日本語</Button>
         <Button onClick={() => setLanguage('English')}>English</Button>
       </Box>
       <Box> Lunch/Dinner </Box>
       <Box component="ol" className="pl-0">
-        {dinnerMenuItems.map((item:MenuItemType) => (
-          <IndexSingleMenuItem key={item._id} menuItem={item} language={language} />
+        {dinnerMenuItems.map((item: MenuItemType, index) => (
+          <IndexSingleMenuItem key={`${item._id}-${language}`} menuItem={item} language={language} delay={index * 500}/>
         ))}
       </Box>
+
     </Box>
   );
 }
